@@ -1,4 +1,4 @@
-package br.com.rafael.pocketclass;
+package br.com.rafael.pocketclass.task;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 import java.util.List;
 
+import br.com.rafael.pocketclass.WebClient;
 import br.com.rafael.pocketclass.converter.AlunoConverter;
 import br.com.rafael.pocketclass.dao.AlunoDAO;
 import br.com.rafael.pocketclass.modelo.Aluno;

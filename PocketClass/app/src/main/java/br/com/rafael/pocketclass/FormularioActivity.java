@@ -23,6 +23,7 @@ import java.io.File;
 
 import br.com.rafael.pocketclass.dao.AlunoDAO;
 import br.com.rafael.pocketclass.modelo.Aluno;
+import br.com.rafael.pocketclass.task.InsereAlunoTask;
 
 public class FormularioActivity extends AppCompatActivity {
 
@@ -83,6 +84,8 @@ public class FormularioActivity extends AppCompatActivity {
                     dao.insere(aluno);
                 }
                 dao.close();
+
+                new InsereAlunoTask(aluno).execute();
 
                 Toast.makeText(FormularioActivity.this, "Aluno "+ aluno.getNome() + " salvo!", Toast.LENGTH_SHORT).show();
                 finish();
