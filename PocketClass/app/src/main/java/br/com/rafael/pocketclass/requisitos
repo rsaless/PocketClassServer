@@ -1,0 +1,15 @@
+Requisitos Básicos: (5 pontos)
+    1 - Utilização de Padrões de Projeto (MVP e organização por Features)           |   EM PROCESSO
+    2 - Ciclo de Vida das Activities implementado corretamente                      |   FEITO
+    3 - Exibição de imagens (caso haja) com Picasso                                 |   EM PROCESSO
+
+Requisitos Complementares (até 5 pontos):
+
+    4 - Utilização dos Recursos do Device (1 ponto)                                 |   FEITO
+    5 - Utilização de Fragments (1 ponto)                                           |   FEITO
+    6 - Utilização de listas personalizadas com RecyclerView (1,5 pontos)           |
+    7 - Persistência de dados com SQLite (1,5 pontos)                               |   FEITO
+    8 - Acesso a Nuvem com Retrofit (1,5 pontos)                                    |
+    9 - Aplicativo com impacto social (2 pontos)                                    |   EM PROCESSO
+
+
