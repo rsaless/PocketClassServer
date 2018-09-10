@@ -51,7 +51,9 @@ public class FormularioActivity extends AppCompatActivity {
                 Intent intentCamera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                  caminhoFoto = getExternalFilesDir(null)+ "/" + System.currentTimeMillis() + ".jpg";
                 File arquivoFoto = new File(caminhoFoto);
-                intentCamera.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(FormularioActivity.this, BuildConfig.APPLICATION_ID + ".provider", arquivoFoto));
+                intentCamera.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(
+                        FormularioActivity.this,
+                        BuildConfig.APPLICATION_ID + ".provider", arquivoFoto));
                 startActivityForResult(intentCamera, CODIGO_CAMERA);
             }
         });

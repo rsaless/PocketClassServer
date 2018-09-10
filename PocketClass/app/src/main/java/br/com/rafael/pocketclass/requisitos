@@ -9,7 +9,7 @@ Requisitos Complementares (até 5 pontos):
     5 - Utilização de Fragments (1 ponto)                                           |   FEITO
     6 - Utilização de listas personalizadas com RecyclerView (1,5 pontos)           |
     7 - Persistência de dados com SQLite (1,5 pontos)                               |   FEITO
-    8 - Acesso a Nuvem com Retrofit (1,5 pontos)                                    |
+    8 - Acesso a Nuvem com Retrofit (1,5 pontos)                                    |   EM PROCESSO
     9 - Aplicativo com impacto social (2 pontos)                                    |   EM PROCESSO
 
 
