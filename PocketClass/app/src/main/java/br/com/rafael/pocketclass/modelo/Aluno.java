@@ -1,8 +1,11 @@
 package br.com.rafael.pocketclass.modelo;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
 
 public class Aluno implements Serializable{
+    @JsonProperty("idCliente")
     private Long id;
     private String nome;
     private String endereco;
