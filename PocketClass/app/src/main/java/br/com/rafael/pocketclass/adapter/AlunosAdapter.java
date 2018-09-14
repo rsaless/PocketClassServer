@@ -35,7 +35,7 @@ public class AlunosAdapter extends BaseAdapter{
     }
 
     @Override public long getItemId(int position) {
-        return alunos.get(position).getId();
+        return 0;
     }
 
     @Override public View getView(int position, View convertView, ViewGroup parent) {

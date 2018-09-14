@@ -94,14 +94,10 @@ public class FormularioActivity extends AppCompatActivity {
                 Call call = new RetrofitInicializador().getAlunoService().insere(aluno);
                 call.enqueue(new Callback() {
                     @Override
-                    public void onResponse(Call call, Response response) {
-
-                    }
+                    public void onResponse(Call call, Response response) {}
 
                     @Override
-                    public void onFailure(Call call, Throwable t) {
-
-                    }
+                    public void onFailure(Call call, Throwable t) {}
                 });
 
                 Toast.makeText(FormularioActivity.this, "Aluno "+ aluno.getNome() + " salvo!", Toast.LENGTH_SHORT).show();

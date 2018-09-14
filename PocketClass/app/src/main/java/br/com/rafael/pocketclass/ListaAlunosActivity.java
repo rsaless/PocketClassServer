@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,8 +20,13 @@ import java.util.List;
 
 import br.com.rafael.pocketclass.adapter.AlunosAdapter;
 import br.com.rafael.pocketclass.dao.AlunoDAO;
+import br.com.rafael.pocketclass.dto.AlunoSync;
 import br.com.rafael.pocketclass.modelo.Aluno;
+import br.com.rafael.pocketclass.retrofit.RetrofitInicializador;
 import br.com.rafael.pocketclass.task.EnviaAlunosTask;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ListaAlunosActivity extends AppCompatActivity {
 
@@ -65,12 +71,35 @@ public class ListaAlunosActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        Call<AlunoSync> call = new RetrofitInicializador().getAlunoService().lista();
+        call.enqueue(new Callback<AlunoSync>() {
+            @Override
+            public void onResponse(Call<AlunoSync> call, Response<AlunoSync> response) {
+                AlunoSync alunoSync = response.body();
+                AlunoDAO dao = new AlunoDAO(ListaAlunosActivity.this);
+                dao.sincroniza(alunoSync.getAlunos());
+                dao.close();
+                carregaLista();
+            }
+
+            @Override
+            public void onFailure(Call<AlunoSync> call, Throwable t) {
+                Log.e("onFailure", t.getMessage());
+            }
+        });
+
         carregaLista();
     }
 
     private void carregaLista() {
         AlunoDAO dao = new AlunoDAO(this);
         List<Aluno> alunos = dao.buscaAlunos();
+        
+        for (Aluno aluno: alunos){
+            Log.i("id do aluno", String.valueOf(aluno.getId()));
+        }
+        
         dao.close();
 
 
