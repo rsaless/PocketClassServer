@@ -26,10 +26,10 @@ import java.util.List;
 
 import br.com.rafael.pocketclass.adapter.AlunosAdapter;
 import br.com.rafael.pocketclass.dao.AlunoDAO;
-import br.com.rafael.pocketclass.dto.AlunoSync;
 import br.com.rafael.pocketclass.event.AtualizaListaAlunoEvent;
 import br.com.rafael.pocketclass.modelo.Aluno;
 import br.com.rafael.pocketclass.retrofit.RetrofitInicializador;
+import br.com.rafael.pocketclass.sinc.AlunoSincronizador;
 import br.com.rafael.pocketclass.task.EnviaAlunosTask;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -39,6 +39,7 @@ public class ListaAlunosActivity extends AppCompatActivity {
 
     public static final int CALL_CODE = 123;
     public static final int SMS_CODE = 321;
+    private final AlunoSincronizador sincronizador = new AlunoSincronizador(this);
     private ListView listaAlunos;
     private SwipeRefreshLayout swipe;
 
@@ -68,7 +69,8 @@ public class ListaAlunosActivity extends AppCompatActivity {
         swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                buscaAlunos();
+                sincronizador.buscaTodos();
+                sincronizador.sincronizaAlunosInternos();
             }
         });
 
@@ -86,7 +88,8 @@ public class ListaAlunosActivity extends AppCompatActivity {
         }
 
         registerForContextMenu(listaAlunos);
-        buscaAlunos();
+        sincronizador.buscaTodos();
+        sincronizador.sincronizaAlunosInternos();
     }
 
     @Override
@@ -95,33 +98,12 @@ public class ListaAlunosActivity extends AppCompatActivity {
         carregaLista();
     }
 
-    private void buscaAlunos() {
-        Call<AlunoSync> call = new RetrofitInicializador().getAlunoService().lista();
-        call.enqueue(new Callback<AlunoSync>() {
-            @Override
-            public void onResponse(Call<AlunoSync> call, Response<AlunoSync> response) {
-                AlunoSync alunoSync = response.body();
-                AlunoDAO dao = new AlunoDAO(ListaAlunosActivity.this);
-                dao.sincroniza(alunoSync.getAlunos());
-                dao.close();
-                carregaLista();
-                swipe.setRefreshing(false);
-            }
-
-            @Override
-            public void onFailure(Call<AlunoSync> call, Throwable t) {
-                Log.e("onFailure", t.getMessage());
-                swipe.setRefreshing(false);
-            }
-        });
-    }
-
     private void carregaLista() {
         AlunoDAO dao = new AlunoDAO(this);
         List<Aluno> alunos = dao.buscaAlunos();
         
         for (Aluno aluno: alunos){
-            Log.i("id do aluno", String.valueOf(aluno.getId()));
+            Log.i("aluno sincronizado", String.valueOf(aluno.getSincronizado()));
         }
         
         dao.close();
@@ -226,6 +208,9 @@ public class ListaAlunosActivity extends AppCompatActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void atualizaListaAlunoEvent(AtualizaListaAlunoEvent event){
+        if (swipe.isRefreshing()){
+            swipe.setRefreshing(false);
+        }
         carregaLista();
     }
 }
