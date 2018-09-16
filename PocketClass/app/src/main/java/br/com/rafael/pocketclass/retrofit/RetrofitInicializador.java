@@ -1,6 +1,7 @@
 package br.com.rafael.pocketclass.retrofit;
 
 import br.com.rafael.pocketclass.services.AlunoService;
+import br.com.rafael.pocketclass.services.DispositivoService;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -27,4 +28,5 @@ public class RetrofitInicializador {
     public AlunoService getAlunoService() {
         return retrofit.create(AlunoService.class);
     }
+    public DispositivoService getDispositivoService() {return retrofit.create(DispositivoService.class);}
 }

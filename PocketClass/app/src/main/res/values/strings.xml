@@ -8,4 +8,6 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_maps">Map</string>
+    <string name="firebase_token">dyJBw0Y6OZg:APA91bGjrACRbDBpXotBvo0YS8KPtcxRWt0nJKVRit3b3O3BXuUxzHKxII-A-KI4ZCCujeHIqOVT1-kqZtFMNQrU0XGKwcDcazToUvezZbtc6unHhvZLHIcQ_0DCNU3A0F-Qlt84Vs6g</string>
+
 </resources>

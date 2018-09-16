@@ -9,7 +9,21 @@ Requisitos Complementares (até 5 pontos):
     5 - Utilização de Fragments (1 ponto)                                           |   FEITO
     6 - Utilização de listas personalizadas com RecyclerView (1,5 pontos)           |
     7 - Persistência de dados com SQLite (1,5 pontos)                               |   FEITO
-    8 - Acesso a Nuvem com Retrofit (1,5 pontos)                                    |   EM PROCESSO
+    8 - Acesso a Nuvem com Retrofit (1,5 pontos)                                    |   FEITO
     9 - Aplicativo com impacto social (2 pontos)                                    |   EM PROCESSO
 
 
+FEATURES:
+    * utilização do mapa
+    * utilização de ligações
+    * utilização de sms
+    * utilização de navegador
+    * utilização de camera
+    * comunicação com web service para envio de dados para processamento
+    * comunicação completa com web service/api para sincronização dos dados com servidor
+    * utilização de sqlite para persistencia local dos dados
+    * utilização do retrofit + jackson para comunicação com web services
+    * utilização de fragments
+    * recebimento de notificações por push via firebase
+    * sincronização com servidor via eventbus
+    * receiver para captação de sms recebidos

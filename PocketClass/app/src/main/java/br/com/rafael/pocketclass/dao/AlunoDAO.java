@@ -130,9 +130,14 @@ public class AlunoDAO extends SQLiteOpenHelper{
 
     public void sincroniza(List<Aluno> alunos) {
         for (Aluno aluno: alunos){
+
             if (existe(aluno)){
-                altera(aluno);
-            }else{
+                if (aluno.estaDesativado()){
+                    deleta(aluno);
+                } else {
+                    altera(aluno);
+                }
+            }else if (!aluno.estaDesativado()){
                 insere(aluno);
             }
         }

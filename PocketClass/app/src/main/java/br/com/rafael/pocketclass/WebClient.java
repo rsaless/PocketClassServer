@@ -1,6 +1,7 @@
 package br.com.rafael.pocketclass;
 
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -38,8 +39,10 @@ public class WebClient {
 
         } catch (MalformedURLException e) {
             e.printStackTrace();
+            Log.i("URL mal formada", "url mal formada");
         } catch (IOException e) {
             e.printStackTrace();
+            Log.i("URL Exception", "url Exception");
         }
         return null;
     }

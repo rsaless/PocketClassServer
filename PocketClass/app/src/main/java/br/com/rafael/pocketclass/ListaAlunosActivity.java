@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,12 +16,18 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 
 import br.com.rafael.pocketclass.adapter.AlunosAdapter;
 import br.com.rafael.pocketclass.dao.AlunoDAO;
 import br.com.rafael.pocketclass.dto.AlunoSync;
+import br.com.rafael.pocketclass.event.AtualizaListaAlunoEvent;
 import br.com.rafael.pocketclass.modelo.Aluno;
 import br.com.rafael.pocketclass.retrofit.RetrofitInicializador;
 import br.com.rafael.pocketclass.task.EnviaAlunosTask;
@@ -32,13 +39,20 @@ public class ListaAlunosActivity extends AppCompatActivity {
 
     public static final int CALL_CODE = 123;
     public static final int SMS_CODE = 321;
-    ListView listaAlunos;
+    private ListView listaAlunos;
+    private SwipeRefreshLayout swipe;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lista_alunos);
+
+        EventBus eventBus = EventBus.getDefault();
+        eventBus.register(this);
+
         listaAlunos = (ListView) findViewById(R.id.lista_alunos);
+        swipe = (SwipeRefreshLayout) findViewById(R.id.swipe_lista_aluno);
+
         listaAlunos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> lista, View item, int position, long id) {
@@ -48,6 +62,13 @@ public class ListaAlunosActivity extends AppCompatActivity {
                 intentVaiProFormulario.putExtra("aluno", aluno);
                 startActivity(intentVaiProFormulario);
 
+            }
+        });
+
+        swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                buscaAlunos();
             }
         });
 
@@ -65,13 +86,16 @@ public class ListaAlunosActivity extends AppCompatActivity {
         }
 
         registerForContextMenu(listaAlunos);
-
+        buscaAlunos();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        carregaLista();
+    }
 
+    private void buscaAlunos() {
         Call<AlunoSync> call = new RetrofitInicializador().getAlunoService().lista();
         call.enqueue(new Callback<AlunoSync>() {
             @Override
@@ -81,15 +105,15 @@ public class ListaAlunosActivity extends AppCompatActivity {
                 dao.sincroniza(alunoSync.getAlunos());
                 dao.close();
                 carregaLista();
+                swipe.setRefreshing(false);
             }
 
             @Override
             public void onFailure(Call<AlunoSync> call, Throwable t) {
                 Log.e("onFailure", t.getMessage());
+                swipe.setRefreshing(false);
             }
         });
-
-        carregaLista();
     }
 
     private void carregaLista() {
@@ -152,11 +176,22 @@ public class ListaAlunosActivity extends AppCompatActivity {
         deletar.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                AlunoDAO dao = new AlunoDAO(ListaAlunosActivity.this);
-                dao.deleta(aluno);
-                dao.close();
 
-                carregaLista();
+                Call<Void> call = new RetrofitInicializador().getAlunoService().deleta(aluno.getId());
+                call.enqueue(new Callback<Void>() {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+                        AlunoDAO dao = new AlunoDAO(ListaAlunosActivity.this);
+                        dao.deleta(aluno);
+                        dao.close();
+                        carregaLista();
+                    }
+
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+                        Toast.makeText(ListaAlunosActivity.this, "Não foi possível remover o aluno", Toast.LENGTH_SHORT).show();
+                    }
+                });
                 return false;
             }
         });
@@ -188,17 +223,9 @@ public class ListaAlunosActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-    /**
-     * Outra maneira de fazer a ligação assim que receber a permissão
-     *
-     * @Override
-     * public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-     *    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-     *    if (requestCode == CALL_CODE){
-     *       Intent intentLigar = new Intent(Intent.ACTION_CALL);
-     *       intentLigar.setData(Uri.parse("tel:" + aluno.getTelefone()));
-     *       startActivity(intentLigar);
-     *   }
-     * }
-     */
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void atualizaListaAlunoEvent(AtualizaListaAlunoEvent event){
+        carregaLista();
+    }
 }
