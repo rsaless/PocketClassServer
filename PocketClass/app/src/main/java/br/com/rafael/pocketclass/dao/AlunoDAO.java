@@ -17,17 +17,24 @@ import br.com.rafael.pocketclass.modelo.Aluno;
 public class AlunoDAO extends SQLiteOpenHelper{
 
     public AlunoDAO(Context context) {
-        super(context, "PocketClass", null, 5);
+        super(context, "PocketClass", null, 6);
     }
 
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-        String sql = "CREATE TABLE Alunos(id CHAR(36) PRIMARY KEY, nome TEXT NOT NULL, endereco TEXT, telefone TEXT, site TEXT, nota REAL, caminhoFoto TEXT, sinconizado INT DEFAULT 0);";
+    @Override public void onCreate(SQLiteDatabase db) {
+        String sql = "CREATE TABLE Alunos(" +
+                "id CHAR(36) PRIMARY KEY, " +
+                "nome TEXT NOT NULL, " +
+                "endereco TEXT, " +
+                "telefone TEXT, " +
+                "site TEXT, " +
+                "nota REAL, " +
+                "caminhoFoto TEXT, " +
+                "sincronizado INT DEFAULT 0," +
+                "desativado INT DEFAULT 0" +
+                ");";
         db.execSQL(sql);
     }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         String sql = "";
         switch (oldVersion){
             case 1:
@@ -54,22 +61,12 @@ public class AlunoDAO extends SQLiteOpenHelper{
                 }
             case 4:
                 sql = "ALTER TABLE Alunos ADD COLUMN sincronizado INT DEFAULT 0;"; db.execSQL(sql);
+            case 5:
+                sql = "ALTER TABLE Alunos ADD COLUMN desativado INT DEFAULT 0;"; db.execSQL(sql);
         }
     }
 
-    private String geraUUID() {
-        return UUID.randomUUID().toString();
-    }
-
-    public void insere(Aluno aluno) {
-        SQLiteDatabase db = getWritableDatabase();
-        if (aluno.getId() == null) aluno.setId(geraUUID());
-        ContentValues dados = pegaDadosDoAluno(aluno);
-        db.insert("Alunos", null, dados);
-    }
-
-    @NonNull
-    private ContentValues pegaDadosDoAluno(Aluno aluno) {
+    @NonNull private ContentValues pegaDadosDoAluno(Aluno aluno) {
         ContentValues dados = new ContentValues();
         dados.put("id", aluno.getId());
         dados.put("nome", aluno.getNome());
@@ -79,21 +76,10 @@ public class AlunoDAO extends SQLiteOpenHelper{
         dados.put("nota", aluno.getNota());
         dados.put("caminhoFoto", aluno.getCaminhoFoto());
         dados.put("sincronizado", aluno.getSincronizado());
+        dados.put("desativado", aluno.getDesativado());
         return dados;
     }
-
-    public List<Aluno> buscaAlunos() {
-        String sql = "SELECT * FROM Alunos";
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor c = db.rawQuery(sql, null);
-        List<Aluno> alunos = populaAlunos(c);
-        c.close();
-
-        return alunos;
-    }
-
-    @NonNull
-    private List<Aluno> populaAlunos(Cursor c) {
+    @NonNull private List<Aluno> populaAlunos(Cursor c) {
         List<Aluno> alunos = new ArrayList<Aluno>();
         while (c.moveToNext()){
             Aluno aluno = new Aluno();
@@ -105,24 +91,19 @@ public class AlunoDAO extends SQLiteOpenHelper{
             aluno.setNota(c.getDouble(c.getColumnIndex("nota")));
             aluno.setCaminhoFoto(c.getString(c.getColumnIndex("caminhoFoto")));
             aluno.setSincronizado(c.getInt(c.getColumnIndex("sincronizado")));
+            aluno.setDesativado(c.getInt(c.getColumnIndex("desativado")));
             alunos.add(aluno);
         }
         return alunos;
     }
 
-    public void deleta(Aluno aluno) {
-        SQLiteDatabase db = getWritableDatabase();
-        String[] params = {aluno.getId().toString()};
-        db.delete("Alunos", "id = ?", params );
+    private boolean existe(Aluno aluno) {
+        SQLiteDatabase db = getReadableDatabase();
+        String existe = "SELECT id FROM Alunos WHERE id=? LIMIT 1;";
+        Cursor cursor = db.rawQuery(existe, new String[]{aluno.getId()});
+        int quantidade = cursor.getCount();
+        return quantidade > 0;
     }
-
-    public void altera(Aluno aluno) {
-        SQLiteDatabase db = getWritableDatabase();
-        ContentValues dados = pegaDadosDoAluno(aluno);
-        String[] params = {aluno.getId().toString()};
-        db.update("Alunos", dados, "id = ?", params );
-    }
-
     public boolean ehAluno(String telefone){
         SQLiteDatabase db = getReadableDatabase();
         Cursor c = db.rawQuery("SELECT * FROM Alunos WHERE telefone = ?", new String[]{telefone});
@@ -145,19 +126,46 @@ public class AlunoDAO extends SQLiteOpenHelper{
             }
         }
     }
-
-    private boolean existe(Aluno aluno) {
-        SQLiteDatabase db = getReadableDatabase();
-        String existe = "SELECT id FROM Alunos WHERE id=? LIMIT 1;";
-        Cursor cursor = db.rawQuery(existe, new String[]{aluno.getId()});
-        int quantidade = cursor.getCount();
-        return quantidade > 0;
+    public void altera(Aluno aluno) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues dados = pegaDadosDoAluno(aluno);
+        String[] params = {aluno.getId().toString()};
+        db.update("Alunos", dados, "id = ?", params );
+    }
+    public void deleta(Aluno aluno) {
+        SQLiteDatabase db = getWritableDatabase();
+        String[] params = {aluno.getId().toString()};
+        if (aluno.estaDesativado()){
+            db.delete("Alunos", "id = ?", params );
+        } else {
+            aluno.desativa();
+            altera(aluno);
+        }
+    }
+    public void insere(Aluno aluno) {
+        SQLiteDatabase db = getWritableDatabase();
+        if (aluno.getId() == null) aluno.setId(geraUUID());
+        ContentValues dados = pegaDadosDoAluno(aluno);
+        db.insert("Alunos", null, dados);
     }
 
+    public List<Aluno> buscaAlunos() {
+        String sql = "SELECT * FROM Alunos WHERE desativado = 0;";
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor c = db.rawQuery(sql, null);
+        List<Aluno> alunos = populaAlunos(c);
+        c.close();
+
+        return alunos;
+    }
     public List<Aluno> listaNaoSincronizados(){
         SQLiteDatabase db = getReadableDatabase();
         String sql = "SELECT * FROM Alunos WHERE sincronizado = 0;";
         Cursor cursor = db.rawQuery(sql, null);
         return populaAlunos(cursor);
+    }
+
+    private String geraUUID() {
+        return UUID.randomUUID().toString();
     }
 }

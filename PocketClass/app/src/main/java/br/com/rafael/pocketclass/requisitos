@@ -27,3 +27,5 @@ FEATURES:
     * recebimento de notificações por push via firebase
     * sincronização com servidor via eventbus
     * receiver para captação de sms recebidos
+    * sincronização completa no modo offline (inserção, alteração e remoção de dados)
+    * versionamento de dados e merge de informações

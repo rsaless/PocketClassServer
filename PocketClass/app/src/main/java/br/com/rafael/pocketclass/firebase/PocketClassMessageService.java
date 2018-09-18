@@ -14,6 +14,7 @@ import java.util.Map;
 import br.com.rafael.pocketclass.dao.AlunoDAO;
 import br.com.rafael.pocketclass.dto.AlunoSync;
 import br.com.rafael.pocketclass.event.AtualizaListaAlunoEvent;
+import br.com.rafael.pocketclass.sinc.AlunoSincronizador;
 
 public class PocketClassMessageService extends FirebaseMessagingService {
     @Override
@@ -33,9 +34,7 @@ public class PocketClassMessageService extends FirebaseMessagingService {
             ObjectMapper mapper = new ObjectMapper();
             try {
                 AlunoSync alunoSync = mapper.readValue(json, AlunoSync.class);
-                AlunoDAO alunoDAO = new AlunoDAO(this);
-                alunoDAO.sincroniza(alunoSync.getAlunos());
-                alunoDAO.close();
+                new AlunoSincronizador(PocketClassMessageService.this).sincroniza(alunoSync);
                 EventBus eventBus = EventBus.getDefault();
                 eventBus.post(new AtualizaListaAlunoEvent());
             } catch (IOException e) {

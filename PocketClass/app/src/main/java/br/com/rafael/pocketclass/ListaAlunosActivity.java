@@ -16,7 +16,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -28,12 +27,8 @@ import br.com.rafael.pocketclass.adapter.AlunosAdapter;
 import br.com.rafael.pocketclass.dao.AlunoDAO;
 import br.com.rafael.pocketclass.event.AtualizaListaAlunoEvent;
 import br.com.rafael.pocketclass.modelo.Aluno;
-import br.com.rafael.pocketclass.retrofit.RetrofitInicializador;
 import br.com.rafael.pocketclass.sinc.AlunoSincronizador;
 import br.com.rafael.pocketclass.task.EnviaAlunosTask;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class ListaAlunosActivity extends AppCompatActivity {
 
@@ -70,7 +65,6 @@ public class ListaAlunosActivity extends AppCompatActivity {
             @Override
             public void onRefresh() {
                 sincronizador.buscaTodos();
-                sincronizador.sincronizaAlunosInternos();
             }
         });
 
@@ -89,7 +83,6 @@ public class ListaAlunosActivity extends AppCompatActivity {
 
         registerForContextMenu(listaAlunos);
         sincronizador.buscaTodos();
-        sincronizador.sincronizaAlunosInternos();
     }
 
     @Override
@@ -159,21 +152,11 @@ public class ListaAlunosActivity extends AppCompatActivity {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
 
-                Call<Void> call = new RetrofitInicializador().getAlunoService().deleta(aluno.getId());
-                call.enqueue(new Callback<Void>() {
-                    @Override
-                    public void onResponse(Call<Void> call, Response<Void> response) {
-                        AlunoDAO dao = new AlunoDAO(ListaAlunosActivity.this);
-                        dao.deleta(aluno);
-                        dao.close();
-                        carregaLista();
-                    }
-
-                    @Override
-                    public void onFailure(Call<Void> call, Throwable t) {
-                        Toast.makeText(ListaAlunosActivity.this, "Não foi possível remover o aluno", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                AlunoDAO dao = new AlunoDAO(ListaAlunosActivity.this);
+                dao.deleta(aluno);
+                dao.close();
+                carregaLista();
+                sincronizador.deleta(aluno);
                 return false;
             }
         });
