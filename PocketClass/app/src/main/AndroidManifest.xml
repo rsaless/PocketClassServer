@@ -18,16 +18,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".ListaAlunosActivity">
+        <activity android:name=".ui.activity.ListaAlunosActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".FormularioActivity" />
+        <activity android:name=".ui.activity.FormularioActivity" />
 
-        <receiver android:name=".receiver.SMSReceiver">
+        <receiver android:name=".utils.receiver.SMSReceiver">
             <intent-filter>
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
@@ -43,19 +43,19 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
-        <activity android:name=".ProvasActivity" />
-        <activity android:name=".DetalhesProvaActivity" />
-        <activity android:name=".ProvasTabletActivity" />
+        <activity android:name=".ui.activity.ProvasActivity" />
+        <activity android:name=".ui.activity.DetalhesProvaActivity" />
+        <activity android:name=".ui.activity.ProvasTabletActivity" />
 
         <service
-            android:name=".firebase.PocketClassInstanceIDService">
+            android:name=".web.firebase.PocketClassInstanceIDService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
             </intent-filter>
         </service>
 
         <service
-            android:name=".firebase.PocketClassMessageService">
+            android:name=".web.firebase.PocketClassMessageService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
