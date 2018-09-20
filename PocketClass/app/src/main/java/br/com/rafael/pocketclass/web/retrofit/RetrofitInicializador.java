@@ -9,7 +9,7 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 
 
 public class RetrofitInicializador {
-    public String ip = "192.168.1.19";
+    public String ip = "192.168.1.20";
     private final Retrofit retrofit;
 
     HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY);
