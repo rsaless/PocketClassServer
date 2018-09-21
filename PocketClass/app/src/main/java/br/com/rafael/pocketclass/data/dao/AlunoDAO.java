@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -168,4 +169,5 @@ public class AlunoDAO extends SQLiteOpenHelper{
     private String geraUUID() {
         return UUID.randomUUID().toString();
     }
+
 }

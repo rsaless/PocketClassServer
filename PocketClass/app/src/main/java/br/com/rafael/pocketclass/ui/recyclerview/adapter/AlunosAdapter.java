@@ -15,12 +15,14 @@ import java.util.List;
 import br.com.rafael.pocketclass.R;
 import br.com.rafael.pocketclass.data.modelo.Aluno;
 import br.com.rafael.pocketclass.ui.recyclerview.adapter.listener.OnItemClickListener;
+import br.com.rafael.pocketclass.ui.recyclerview.adapter.listener.OnItemLongClickListener;
 
 public class AlunosAdapter extends RecyclerView.Adapter<AlunosAdapter.AlunoViewHolder> {
 
     private List<Aluno> alunos;
     private Context context;
     private OnItemClickListener onItemClickListener;
+    private OnItemLongClickListener onItemLongClickListener;
 
     public AlunosAdapter(Context context, List<Aluno> alunos){
         this.context = context;
@@ -29,6 +31,9 @@ public class AlunosAdapter extends RecyclerView.Adapter<AlunosAdapter.AlunoViewH
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
+    }
+    public void setOnItemLongClickListener(OnItemLongClickListener onItemLongClickListener){
+        this.onItemLongClickListener = onItemLongClickListener;
     }
 
     @Override public AlunosAdapter.AlunoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -68,6 +73,13 @@ public class AlunosAdapter extends RecyclerView.Adapter<AlunosAdapter.AlunoViewH
                 @Override
                 public void onClick(View v) {
                     onItemClickListener.onItemClick(aluno, getAdapterPosition());
+                }
+            });
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    onItemLongClickListener.onItemLongClick(aluno, getAdapterPosition());
+                    return true;
                 }
             });
         }

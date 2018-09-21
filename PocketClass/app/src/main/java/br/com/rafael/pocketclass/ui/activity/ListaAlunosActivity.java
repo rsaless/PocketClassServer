@@ -9,12 +9,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -26,8 +26,10 @@ import br.com.rafael.pocketclass.R;
 import br.com.rafael.pocketclass.data.dao.AlunoDAO;
 import br.com.rafael.pocketclass.ui.recyclerview.adapter.AlunosAdapter;
 import br.com.rafael.pocketclass.ui.recyclerview.adapter.listener.OnItemClickListener;
+import br.com.rafael.pocketclass.ui.recyclerview.adapter.listener.OnItemLongClickListener;
 import br.com.rafael.pocketclass.utils.event.AtualizaListaAlunoEvent;
 import br.com.rafael.pocketclass.data.modelo.Aluno;
+import br.com.rafael.pocketclass.utils.helper.AlunoItemTouchHelperCallback;
 import br.com.rafael.pocketclass.utils.sinc.AlunoSincronizador;
 import br.com.rafael.pocketclass.utils.task.EnviaAlunosTask;
 
@@ -79,7 +81,7 @@ public class ListaAlunosActivity extends AppCompatActivity {
         carregaLista();
     }
 
-    private void carregaLista() {
+    public void carregaLista() {
         AlunoDAO dao = new AlunoDAO(this);
         List<Aluno> alunos = dao.buscaAlunos();
         
@@ -95,7 +97,7 @@ public class ListaAlunosActivity extends AppCompatActivity {
 
     private void configuraRecyclerView(List<Aluno> alunos) {
         //ArrayAdapter<Aluno> adapter = new ArrayAdapter<Aluno>(this, R.layout.list_item, alunos);
-        AlunosAdapter adapter = new AlunosAdapter(this, alunos);
+        final AlunosAdapter adapter = new AlunosAdapter(this, alunos);
         listaAlunos.setAdapter(adapter);
         adapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
@@ -105,9 +107,20 @@ public class ListaAlunosActivity extends AppCompatActivity {
                 startActivity(intentVaiProFormulario);
             }
         });
+        adapter.setOnItemLongClickListener(new OnItemLongClickListener() {
+            @Override
+            public void onItemLongClick(Aluno aluno, int posicao) {
+                AlunoDAO dao = new AlunoDAO(ListaAlunosActivity.this);
+                dao.deleta(aluno);
+                dao.close();
+                carregaLista();
+                sincronizador.deleta(aluno);
+            }
+        });
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         listaAlunos.setLayoutManager(layoutManager);
     }
+
 
     /*
         @Override
@@ -149,22 +162,8 @@ public class ListaAlunosActivity extends AppCompatActivity {
             }
             intentSite.setData(Uri.parse(site));
             itemSite.setIntent(intentSite);
-
-            MenuItem deletar = menu.add("Deletar");
-            deletar.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-
-                    AlunoDAO dao = new AlunoDAO(ListaAlunosActivity.this);
-                    dao.deleta(aluno);
-                    dao.close();
-                    carregaLista();
-                    sincronizador.deleta(aluno);
-                    return false;
-                }
-            });
         }
-    */
+*/
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_lista_alunos, menu);
