@@ -8,4 +8,28 @@
         android:icon="@drawable/ic_confirmar"
         app:showAsAction="always"/>
 
+    <item
+        android:id="@+id/menu_formulario_ligar"
+        android:title="Ligar"
+        android:icon="@drawable/ic_action_call"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/menu_formulario_sms"
+        android:title="Eviar SMS"
+        android:icon="@drawable/ic_action_sms"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/menu_formulario_mapa"
+        android:title="Ver no mapa"
+        android:icon="@drawable/ic_action_map"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/menu_formulario_site"
+        android:title="Ver site"
+        android:icon="@drawable/ic_action_site"
+        app:showAsAction="never"/>
+
 </menu>

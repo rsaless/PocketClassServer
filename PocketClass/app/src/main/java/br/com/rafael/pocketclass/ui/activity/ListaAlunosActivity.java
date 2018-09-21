@@ -35,7 +35,6 @@ import br.com.rafael.pocketclass.utils.task.EnviaAlunosTask;
 
 public class ListaAlunosActivity extends AppCompatActivity {
 
-    public static final int CALL_CODE = 123;
     public static final int SMS_CODE = 321;
     private final AlunoSincronizador sincronizador = new AlunoSincronizador(this);
     private RecyclerView listaAlunos;
@@ -162,6 +161,20 @@ public class ListaAlunosActivity extends AppCompatActivity {
             }
             intentSite.setData(Uri.parse(site));
             itemSite.setIntent(intentSite);
+
+            MenuItem deletar = menu.add("Deletar");
+            deletar.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+
+                    AlunoDAO dao = new AlunoDAO(ListaAlunosActivity.this);
+                    dao.deleta(aluno);
+                    dao.close();
+                    carregaLista();
+                    sincronizador.deleta(aluno);
+                    return false;
+                }
+            });
         }
 */
     @Override
